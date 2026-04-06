@@ -28,10 +28,18 @@ const userSchema = new mongoose.Schema({
     authProvider: {
         type: String
     },
-    authId: {
+    googleId: {
         type: String,
         unique: true,
         sparse: true // allows null for non-OAuth users
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    expiresAt: {
+        type: Date,
+        default: null
     },
     refreshToken: {
         type: String,

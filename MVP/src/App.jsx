@@ -1,7 +1,12 @@
 // src/App.jsx
 import { useEffect, useState, useCallback } from "react";
-import { fetchChannelVideos, resolveChannel } from "./youtube";
-import { getSavedChannels, saveChannel, removeChannel } from "./channelStore";
+import { fetchChannelVideos, resolveChannel, resolvePlaylist } from "./youtube";
+import {
+  getSavedChannels,
+  saveChannel,
+  removeChannel,
+  savePlaylist,
+} from "./channelStore";
 import ChannelList from "./ChannelList";
 import VideoCard from "./VideoCard";
 import VideoPlayer from "./VideoPlayer";
@@ -24,6 +29,12 @@ export default function App() {
   async function handleAddChannel(input) {
     const resolved = await resolveChannel(input);
     const updated = saveChannel(resolved);
+    setChannels(updated);
+  }
+
+  async function handleAddPlaylist(input) {
+    const resolved = await resolvePlaylist(input);
+    const updated = savePlaylist(resolved);
     setChannels(updated);
   }
 
@@ -82,6 +93,7 @@ export default function App() {
           <ChannelList
             channels={channels}
             onAdd={handleAddChannel}
+            onAddPlaylist={handleAddPlaylist}
             onSelect={handleSelectChannel}
             onRemove={handleRemoveChannel}
           />

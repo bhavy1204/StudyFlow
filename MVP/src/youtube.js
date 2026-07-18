@@ -58,6 +58,44 @@ export async function resolveChannel(input) {
   };
 }
 
+// Extracts a playlist ID from a full URL or raw ID
+function extractPlaylistId(input) {
+  const trimmed = input.trim();
+  if (/^(PL|UU|FL|LL)[a-zA-Z0-9_-]+$/.test(trimmed)) return trimmed;
+
+  try {
+    const url = new URL(trimmed);
+    const listParam = url.searchParams.get('list');
+    if (listParam) return listParam;
+  } catch {
+    // not a URL, fall through
+  }
+  return null;
+}
+
+export async function resolvePlaylist(input) {
+  const playlistId = extractPlaylistId(input);
+  if (!playlistId) throw new Error('Could not find a playlist ID in that link.');
+
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${YOUTUBE_API_KEY}`
+  );
+  const data = await res.json();
+
+  if (!data.items || data.items.length === 0) {
+    throw new Error('Playlist not found or is private.');
+  }
+
+  const item = data.items[0];
+  return {
+    id: playlistId,
+    type: 'playlist',
+    uploadsPlaylistId: playlistId, // reuse same field your video grid already reads
+    name: item.snippet.title,
+    thumbnail: item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url,
+  };
+}
+
 /**
  * Fetches a page of videos from a given uploads playlist.
  */

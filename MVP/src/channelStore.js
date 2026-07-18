@@ -20,6 +20,16 @@ export function saveChannel(channel) {
     return updated;
 }
 
+export function savePlaylist(playlist) {
+    const all = getSavedChannels(); // however your existing getter is named
+    const exists = all.some((c) => c.id === playlist.id);
+    if (exists) return all;
+
+    const updated = [...all, { ...playlist, type: 'playlist' }];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    return updated;
+}
+
 export function removeChannel(channelId) {
     const updated = getSavedChannels().filter((c) => c.channelId !== channelId);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
